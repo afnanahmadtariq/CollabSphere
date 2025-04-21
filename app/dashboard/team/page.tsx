@@ -20,6 +20,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Mail, Phone, Plus, Search, UserPlus } from "lucide-react"
+import { toast } from "@/components/ui/use-toast"
 
 // Mock team data
 const teamMembers = [
@@ -146,6 +147,15 @@ export default function TeamPage() {
 
   const handleAddMember = () => {
     // In a real app, this would call an API to add the team member
+    if (!newMember.name || !newMember.email || !newMember.role || !newMember.department) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      })
+      return
+    }
+
     console.log("Adding team member:", newMember)
 
     // Reset form and close dialog
@@ -157,6 +167,11 @@ export default function TeamPage() {
       phone: "",
     })
     setAddMemberOpen(false)
+
+    toast({
+      title: "Team member added",
+      description: `${newMember.name} has been added to the team.`,
+    })
   }
 
   const getStatusColor = (status: string) => {

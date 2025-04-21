@@ -146,6 +146,9 @@ export default function ChatPage() {
 
     setChatMessages([...chatMessages, newMessage])
     setMessageText("")
+
+    // In a real app, this would send the message to the server
+    console.log("Message sent:", newMessage)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

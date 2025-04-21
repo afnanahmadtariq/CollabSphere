@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar, Edit, FileText, MessageSquare, Plus, Users } from "lucide-react"
+import { ProjectChat } from "@/components/project-chat"
+import { useToast } from "@/components/ui/use-toast"
+import { Progress } from "@/components/ui/progress"
 
 // Mock project data
 const project = {
@@ -90,6 +93,8 @@ const project = {
 export default function ProjectDetailPage() {
   const { user } = useAuth()
   const params = useParams()
+  const router = useRouter()
+  const { toast } = useToast()
   const isManager = user?.role === "manager"
   const [newTaskOpen, setNewTaskOpen] = useState(false)
   const [taskTitle, setTaskTitle] = useState("")
@@ -97,15 +102,33 @@ export default function ProjectDetailPage() {
   const [taskAssignee, setTaskAssignee] = useState("")
   const [taskPriority, setTaskPriority] = useState("Medium")
   const [taskDueDate, setTaskDueDate] = useState("")
+  const [showChat, setShowChat] = useState(false)
 
   const handleAddTask = () => {
+    // Validate form
+    if (!taskTitle || !taskDescription || !taskAssignee || !taskDueDate) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      })
+      return
+    }
+
     // In a real app, this would call an API to add the task
-    console.log("Adding task:", {
+    const newTask = {
+      id: `task-${Date.now()}`,
       title: taskTitle,
       description: taskDescription,
+      status: "To Do",
       assignee: taskAssignee,
-      priority: taskPriority,
       dueDate: taskDueDate,
+      priority: taskPriority,
+    }
+
+    toast({
+      title: "Task added",
+      description: `Task "${taskTitle}" has been added to the project.`,
     })
 
     // Reset form and close dialog
@@ -115,6 +138,9 @@ export default function ProjectDetailPage() {
     setTaskPriority("Medium")
     setTaskDueDate("")
     setNewTaskOpen(false)
+
+    // In a real app, this would refresh the task list
+    console.log("New task created:", newTask)
   }
 
   const getStatusColor = (status: string) => {
@@ -142,6 +168,10 @@ export default function ProjectDetailPage() {
         return "text-muted-foreground"
     }
   }
+
+  const completedTasks = project.tasks.filter((t) => t.status === "Completed").length
+  const totalTasks = project.tasks.length
+  const progressPercentage = Math.round((completedTasks / totalTasks) * 100)
 
   return (
     <div className="space-y-6">
@@ -241,9 +271,9 @@ export default function ProjectDetailPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <Card>
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
               <Calendar className="h-5 w-5" /> Timeline
             </CardTitle>
           </CardHeader>
@@ -259,25 +289,18 @@ export default function ProjectDetailPage() {
               </div>
               <div className="space-y-2">
                 <div className="text-sm text-muted-foreground">Progress</div>
-                <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                  <div
-                    className="bg-primary h-full rounded-full"
-                    style={{
-                      width: `${(project.tasks.filter((t) => t.status === "Completed").length / project.tasks.length) * 100}%`,
-                    }}
-                  />
-                </div>
+                <Progress value={progressPercentage} className="h-2" indicatorColor="bg-blue-500" />
                 <div className="text-sm text-right">
-                  {project.tasks.filter((t) => t.status === "Completed").length}/{project.tasks.length} tasks completed
+                  {completedTasks}/{totalTasks} tasks completed ({progressPercentage}%)
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
               <Users className="h-5 w-5" /> Team Members
             </CardTitle>
           </CardHeader>
@@ -298,18 +321,23 @@ export default function ProjectDetailPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200 dark:border-amber-800">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
               <MessageSquare className="h-5 w-5" /> Project Chat
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[200px] flex items-center justify-center border rounded-md">
+            <div className="h-[200px] flex items-center justify-center">
               <div className="flex flex-col items-center gap-2 text-muted-foreground">
                 <MessageSquare className="h-8 w-8" />
                 <p>Project chat messages</p>
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowChat(true)}
+                  className="bg-white dark:bg-gray-800"
+                >
                   Open Chat
                 </Button>
               </div>
@@ -338,7 +366,7 @@ export default function ProjectDetailPage() {
                 {project.tasks.map((task) => (
                   <div
                     key={task.id}
-                    className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border rounded-lg"
+                    className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -360,8 +388,8 @@ export default function ProjectDetailPage() {
                         <span className="text-muted-foreground">Priority: </span>
                         <span className={getPriorityColor(task.priority)}>{task.priority}</span>
                       </div>
-                      <Button variant="outline" size="sm">
-                        View
+                      <Button variant="outline" size="sm" asChild>
+                        <a href={`/dashboard/projects/${params.id}/tasks/${task.id}`}>View</a>
                       </Button>
                     </div>
                   </div>
@@ -375,7 +403,7 @@ export default function ProjectDetailPage() {
                   .map((task) => (
                     <div
                       key={task.id}
-                      className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border rounded-lg"
+                      className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -397,8 +425,8 @@ export default function ProjectDetailPage() {
                           <span className="text-muted-foreground">Priority: </span>
                           <span className={getPriorityColor(task.priority)}>{task.priority}</span>
                         </div>
-                        <Button variant="outline" size="sm">
-                          View
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={`/dashboard/projects/${params.id}/tasks/${task.id}`}>View</a>
                         </Button>
                       </div>
                     </div>
@@ -412,7 +440,7 @@ export default function ProjectDetailPage() {
                   .map((task) => (
                     <div
                       key={task.id}
-                      className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border rounded-lg"
+                      className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -434,8 +462,8 @@ export default function ProjectDetailPage() {
                           <span className="text-muted-foreground">Priority: </span>
                           <span className={getPriorityColor(task.priority)}>{task.priority}</span>
                         </div>
-                        <Button variant="outline" size="sm">
-                          View
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={`/dashboard/projects/${params.id}/tasks/${task.id}`}>View</a>
                         </Button>
                       </div>
                     </div>
@@ -449,7 +477,7 @@ export default function ProjectDetailPage() {
                   .map((task) => (
                     <div
                       key={task.id}
-                      className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border rounded-lg"
+                      className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -471,8 +499,8 @@ export default function ProjectDetailPage() {
                           <span className="text-muted-foreground">Priority: </span>
                           <span className={getPriorityColor(task.priority)}>{task.priority}</span>
                         </div>
-                        <Button variant="outline" size="sm">
-                          View
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={`/dashboard/projects/${params.id}/tasks/${task.id}`}>View</a>
                         </Button>
                       </div>
                     </div>
@@ -482,6 +510,19 @@ export default function ProjectDetailPage() {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Project Chat Dialog */}
+      <Dialog open={showChat} onOpenChange={setShowChat}>
+        <DialogContent className="max-w-3xl h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Project Chat: {project.name}</DialogTitle>
+            <DialogDescription>Communicate with your team about this project</DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <ProjectChat projectId={params.id as string} projectName={project.name} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

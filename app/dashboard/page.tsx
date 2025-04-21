@@ -4,8 +4,9 @@ import { useAuth } from "@/hooks/use-auth"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BarChart, CheckCircle, Clock, FileText, MessageSquare, Plus, Users } from "lucide-react"
+import { CheckCircle, Clock, FileText, MessageSquare, Plus, Users } from "lucide-react"
 import Link from "next/link"
+import { DashboardChart } from "@/components/dashboard-chart"
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -17,25 +18,25 @@ export default function DashboardPage() {
       title: "Total Projects",
       value: "12",
       icon: FileText,
-      description: "Active projects",
+      color: "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300",
     },
     {
       title: "Tasks Completed",
       value: "64",
       icon: CheckCircle,
-      description: "Last 30 days",
+      color: "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300",
     },
     {
       title: "Team Members",
       value: "8",
       icon: Users,
-      description: "Active members",
+      color: "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300",
     },
     {
       title: "Messages",
       value: "142",
       icon: MessageSquare,
-      description: "Unread messages",
+      color: "bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-300",
     },
   ]
 
@@ -63,16 +64,28 @@ export default function DashboardPage() {
                 <div className="flex flex-col gap-1">
                   <span className="text-muted-foreground text-sm">{stat.title}</span>
                   <span className="text-2xl font-bold">{stat.value}</span>
-                  <span className="text-xs text-muted-foreground">{stat.description}</span>
+                  <span className="text-xs text-muted-foreground">Last 30 days</span>
                 </div>
-                <div className="bg-primary/10 p-2 rounded-full">
-                  <stat.icon className="h-5 w-5 text-primary" />
+                <div className={`p-2 rounded-full ${stat.color}`}>
+                  <stat.icon className="h-5 w-5" />
                 </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Weekly Progress</CardTitle>
+          <CardDescription>Tasks completed vs. total tasks assigned per day</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px]">
+            <DashboardChart />
+          </div>
+        </CardContent>
+      </Card>
 
       <Tabs defaultValue="recent">
         <TabsList>
@@ -87,18 +100,52 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {[1, 2, 3, 4, 5].map((i) => (
+                {[
+                  {
+                    icon: MessageSquare,
+                    color: "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300",
+                    title: 'New comment on "Homepage Redesign"',
+                    description: 'Alex commented: "I\'ve completed the initial wireframes for review."',
+                    time: "2h ago",
+                  },
+                  {
+                    icon: CheckCircle,
+                    color: "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300",
+                    title: 'Task completed: "Update API documentation"',
+                    description: "Emily marked the task as completed.",
+                    time: "4h ago",
+                  },
+                  {
+                    icon: FileText,
+                    color: "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300",
+                    title: 'New project created: "Mobile App Development"',
+                    description: "Alex created a new project and assigned 5 team members.",
+                    time: "1d ago",
+                  },
+                  {
+                    icon: Users,
+                    color: "bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-300",
+                    title: "New team member added",
+                    description: "Jessica Taylor joined the Marketing team.",
+                    time: "2d ago",
+                  },
+                  {
+                    icon: MessageSquare,
+                    color: "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300",
+                    title: 'New comment on "Database Migration"',
+                    description: 'Michael commented: "I\'ve identified the performance bottleneck."',
+                    time: "3d ago",
+                  },
+                ].map((item, i) => (
                   <div key={i} className="flex items-start gap-4 border-b pb-4 last:border-0">
-                    <div className="bg-primary/10 p-2 rounded-full">
-                      <MessageSquare className="h-4 w-4 text-primary" />
+                    <div className={`p-2 rounded-full ${item.color}`}>
+                      <item.icon className="h-4 w-4" />
                     </div>
                     <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium">New comment on "Homepage Redesign"</p>
-                      <p className="text-xs text-muted-foreground">
-                        Alex commented: "I've completed the initial wireframes for review."
-                      </p>
+                      <p className="text-sm font-medium">{item.title}</p>
+                      <p className="text-xs text-muted-foreground">{item.description}</p>
                     </div>
-                    <div className="text-xs text-muted-foreground">2h ago</div>
+                    <div className="text-xs text-muted-foreground">{item.time}</div>
                   </div>
                 ))}
               </div>
@@ -113,14 +160,45 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {[1, 2, 3, 4, 5].map((i) => (
+                {[
+                  {
+                    icon: Clock,
+                    color: "bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300",
+                    title: "Finalize API Documentation",
+                    description: "Due in 2 days • High Priority",
+                  },
+                  {
+                    icon: Clock,
+                    color: "bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-300",
+                    title: "Review Homepage Design",
+                    description: "Due in 3 days • Medium Priority",
+                  },
+                  {
+                    icon: Clock,
+                    color: "bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-300",
+                    title: "Implement User Authentication",
+                    description: "Due in 4 days • Medium Priority",
+                  },
+                  {
+                    icon: Clock,
+                    color: "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300",
+                    title: "Create Marketing Assets",
+                    description: "Due in 5 days • Low Priority",
+                  },
+                  {
+                    icon: Clock,
+                    color: "bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300",
+                    title: "Prepare Monthly Report",
+                    description: "Due in 7 days • Low Priority",
+                  },
+                ].map((task, i) => (
                   <div key={i} className="flex items-start gap-4 border-b pb-4 last:border-0">
-                    <div className="bg-primary/10 p-2 rounded-full">
-                      <Clock className="h-4 w-4 text-primary" />
+                    <div className={`p-2 rounded-full ${task.color}`}>
+                      <task.icon className="h-4 w-4" />
                     </div>
                     <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium">Finalize API Documentation</p>
-                      <p className="text-xs text-muted-foreground">Due in 2 days • High Priority</p>
+                      <p className="text-sm font-medium">{task.title}</p>
+                      <p className="text-xs text-muted-foreground">{task.description}</p>
                     </div>
                     <Button variant="outline" size="sm">
                       View
@@ -132,26 +210,6 @@ export default function DashboardPage() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {isManager && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Performance Overview</CardTitle>
-            <CardDescription>Team performance metrics for the last 30 days</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[200px] flex items-center justify-center border rounded-md">
-              <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                <BarChart className="h-8 w-8" />
-                <p>Performance chart visualization</p>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/dashboard/performance">View detailed metrics</Link>
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   )
 }
