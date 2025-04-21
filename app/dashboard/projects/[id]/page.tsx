@@ -1,13 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/use-auth"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Dialog,
   DialogContent,
@@ -16,21 +22,35 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar, Edit, FileText, MessageSquare, Plus, Users } from "lucide-react"
-import { ProjectChat } from "@/components/project-chat"
-import { useToast } from "@/components/ui/use-toast"
-import { Progress } from "@/components/ui/progress"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Calendar,
+  Edit,
+  FileText,
+  MessageSquare,
+  Plus,
+  Users,
+} from "lucide-react";
+import { ProjectChat } from "@/components/project-chat";
+import { useToast } from "@/components/ui/use-toast";
+import { Progress } from "@/components/ui/progress";
 
 // Mock project data
 const project = {
   id: "1",
   name: "Website Redesign",
-  description: "Redesign the company website with a modern look and improved UX",
+  description:
+    "Redesign the company website with a modern look and improved UX",
   status: "In Progress",
   members: [
     { id: "1", name: "Alex Johnson", role: "Project Manager" },
@@ -88,21 +108,28 @@ const project = {
   ],
   startDate: "2025-04-01",
   dueDate: "2025-05-15",
-}
+};
 
 export default function ProjectDetailPage() {
-  const { user } = useAuth()
-  const params = useParams()
-  const router = useRouter()
-  const { toast } = useToast()
-  const isManager = user?.role === "manager"
-  const [newTaskOpen, setNewTaskOpen] = useState(false)
-  const [taskTitle, setTaskTitle] = useState("")
-  const [taskDescription, setTaskDescription] = useState("")
-  const [taskAssignee, setTaskAssignee] = useState("")
-  const [taskPriority, setTaskPriority] = useState("Medium")
-  const [taskDueDate, setTaskDueDate] = useState("")
-  const [showChat, setShowChat] = useState(false)
+  const { user } = useAuth();
+  const params = useParams();
+  const router = useRouter();
+  const { toast } = useToast();
+  const isManager = user?.role === "manager";
+  const [newTaskOpen, setNewTaskOpen] = useState(false);
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
+  const [taskAssignee, setTaskAssignee] = useState("");
+  const [taskPriority, setTaskPriority] = useState("Medium");
+  const [taskDueDate, setTaskDueDate] = useState("");
+  const [showChat, setShowChat] = useState(false);
+  // const [newTask, setNewTask] = useState({
+  //   title: "",
+  //   description: "",
+  //   assignee: "",
+  //   priority: "Medium",
+  //   dueDate: "",
+  // });
 
   const handleAddTask = () => {
     // Validate form
@@ -111,8 +138,8 @@ export default function ProjectDetailPage() {
         title: "Missing information",
         description: "Please fill in all required fields.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     // In a real app, this would call an API to add the task
@@ -124,62 +151,69 @@ export default function ProjectDetailPage() {
       assignee: taskAssignee,
       dueDate: taskDueDate,
       priority: taskPriority,
-    }
+    };
+    project.tasks.push(newTask);
 
     toast({
       title: "Task added",
       description: `Task "${taskTitle}" has been added to the project.`,
-    })
+    });
 
     // Reset form and close dialog
-    setTaskTitle("")
-    setTaskDescription("")
-    setTaskAssignee("")
-    setTaskPriority("Medium")
-    setTaskDueDate("")
-    setNewTaskOpen(false)
+    setTaskTitle("");
+    setTaskDescription("");
+    setTaskAssignee("");
+    setTaskPriority("Medium");
+    setTaskDueDate("");
+    setNewTaskOpen(false);
 
     // In a real app, this would refresh the task list
-    console.log("New task created:", newTask)
-  }
+    console.log("New task created:", newTask);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "To Do":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
       case "In Progress":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
       case "Completed":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
     }
-  }
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "High":
-        return "text-red-600 dark:text-red-400"
+        return "text-red-600 dark:text-red-400";
       case "Medium":
-        return "text-yellow-600 dark:text-yellow-400"
+        return "text-yellow-600 dark:text-yellow-400";
       case "Low":
-        return "text-green-600 dark:text-green-400"
+        return "text-green-600 dark:text-green-400";
       default:
-        return "text-muted-foreground"
+        return "text-muted-foreground";
     }
-  }
+  };
 
-  const completedTasks = project.tasks.filter((t) => t.status === "Completed").length
-  const totalTasks = project.tasks.length
-  const progressPercentage = Math.round((completedTasks / totalTasks) * 100)
+  const completedTasks = project.tasks.filter(
+    (t) => t.status === "Completed"
+  ).length;
+  const totalTasks = project.tasks.length;
+  const progressPercentage = Math.round((completedTasks / totalTasks) * 100);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between gap-4 md:items-center">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
-            <Badge className={getStatusColor(project.status)}>{project.status}</Badge>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {project.name}
+            </h1>
+            <Badge className={getStatusColor(project.status)}>
+              {project.status}
+            </Badge>
           </div>
           <p className="text-muted-foreground mt-1">{project.description}</p>
         </div>
@@ -197,7 +231,10 @@ export default function ProjectDetailPage() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add New Task</DialogTitle>
-                  <DialogDescription>Create a new task for this project. Fill in the details below.</DialogDescription>
+                  <DialogDescription>
+                    Create a new task for this project. Fill in the details
+                    below.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
@@ -221,7 +258,10 @@ export default function ProjectDetailPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="assignee">Assignee</Label>
-                      <Select value={taskAssignee} onValueChange={setTaskAssignee}>
+                      <Select
+                        value={taskAssignee}
+                        onValueChange={setTaskAssignee}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select team member" />
                         </SelectTrigger>
@@ -236,7 +276,10 @@ export default function ProjectDetailPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="priority">Priority</Label>
-                      <Select value={taskPriority} onValueChange={setTaskPriority}>
+                      <Select
+                        value={taskPriority}
+                        onValueChange={setTaskPriority}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select priority" />
                         </SelectTrigger>
@@ -259,7 +302,10 @@ export default function ProjectDetailPage() {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setNewTaskOpen(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setNewTaskOpen(false)}
+                  >
                     Cancel
                   </Button>
                   <Button onClick={handleAddTask}>Add Task</Button>
@@ -281,17 +327,26 @@ export default function ProjectDetailPage() {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <div className="text-sm text-muted-foreground">Start Date</div>
-                <div className="font-medium">{new Date(project.startDate).toLocaleDateString()}</div>
+                <div className="font-medium">
+                  {new Date(project.startDate).toLocaleDateString()}
+                </div>
               </div>
               <div className="flex justify-between">
                 <div className="text-sm text-muted-foreground">Due Date</div>
-                <div className="font-medium">{new Date(project.dueDate).toLocaleDateString()}</div>
+                <div className="font-medium">
+                  {new Date(project.dueDate).toLocaleDateString()}
+                </div>
               </div>
               <div className="space-y-2">
                 <div className="text-sm text-muted-foreground">Progress</div>
-                <Progress value={progressPercentage} className="h-2" indicatorColor="bg-blue-500" />
+                <Progress
+                  value={progressPercentage}
+                  className="h-2"
+                  indicatorColor="bg-blue-500"
+                />
                 <div className="text-sm text-right">
-                  {completedTasks}/{totalTasks} tasks completed ({progressPercentage}%)
+                  {completedTasks}/{totalTasks} tasks completed (
+                  {progressPercentage}%)
                 </div>
               </div>
             </div>
@@ -313,7 +368,9 @@ export default function ProjectDetailPage() {
                   </Avatar>
                   <div>
                     <div className="font-medium">{member.name}</div>
-                    <div className="text-sm text-muted-foreground">{member.role}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {member.role}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -351,7 +408,9 @@ export default function ProjectDetailPage() {
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" /> Tasks
           </CardTitle>
-          <CardDescription>Manage and track all tasks for this project</CardDescription>
+          <CardDescription>
+            Manage and track all tasks for this project
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="all">
@@ -371,13 +430,19 @@ export default function ProjectDetailPage() {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium">{task.title}</h3>
-                        <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
+                        <Badge className={getStatusColor(task.status)}>
+                          {task.status}
+                        </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{task.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {task.description}
+                      </p>
                     </div>
                     <div className="flex flex-wrap gap-4 items-center">
                       <div className="text-sm">
-                        <span className="text-muted-foreground">Assignee: </span>
+                        <span className="text-muted-foreground">
+                          Assignee:{" "}
+                        </span>
                         {task.assignee}
                       </div>
                       <div className="text-sm">
@@ -385,11 +450,19 @@ export default function ProjectDetailPage() {
                         {new Date(task.dueDate).toLocaleDateString()}
                       </div>
                       <div className="text-sm">
-                        <span className="text-muted-foreground">Priority: </span>
-                        <span className={getPriorityColor(task.priority)}>{task.priority}</span>
+                        <span className="text-muted-foreground">
+                          Priority:{" "}
+                        </span>
+                        <span className={getPriorityColor(task.priority)}>
+                          {task.priority}
+                        </span>
                       </div>
                       <Button variant="outline" size="sm" asChild>
-                        <a href={`/dashboard/projects/${params.id}/tasks/${task.id}`}>View</a>
+                        <a
+                          href={`/dashboard/projects/${params.id}/tasks/${task.id}`}
+                        >
+                          View
+                        </a>
                       </Button>
                     </div>
                   </div>
@@ -408,13 +481,19 @@ export default function ProjectDetailPage() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-medium">{task.title}</h3>
-                          <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
+                          <Badge className={getStatusColor(task.status)}>
+                            {task.status}
+                          </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">{task.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {task.description}
+                        </p>
                       </div>
                       <div className="flex flex-wrap gap-4 items-center">
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Assignee: </span>
+                          <span className="text-muted-foreground">
+                            Assignee:{" "}
+                          </span>
                           {task.assignee}
                         </div>
                         <div className="text-sm">
@@ -422,11 +501,19 @@ export default function ProjectDetailPage() {
                           {new Date(task.dueDate).toLocaleDateString()}
                         </div>
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Priority: </span>
-                          <span className={getPriorityColor(task.priority)}>{task.priority}</span>
+                          <span className="text-muted-foreground">
+                            Priority:{" "}
+                          </span>
+                          <span className={getPriorityColor(task.priority)}>
+                            {task.priority}
+                          </span>
                         </div>
                         <Button variant="outline" size="sm" asChild>
-                          <a href={`/dashboard/projects/${params.id}/tasks/${task.id}`}>View</a>
+                          <a
+                            href={`/dashboard/projects/${params.id}/tasks/${task.id}`}
+                          >
+                            View
+                          </a>
                         </Button>
                       </div>
                     </div>
@@ -445,13 +532,19 @@ export default function ProjectDetailPage() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-medium">{task.title}</h3>
-                          <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
+                          <Badge className={getStatusColor(task.status)}>
+                            {task.status}
+                          </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">{task.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {task.description}
+                        </p>
                       </div>
                       <div className="flex flex-wrap gap-4 items-center">
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Assignee: </span>
+                          <span className="text-muted-foreground">
+                            Assignee:{" "}
+                          </span>
                           {task.assignee}
                         </div>
                         <div className="text-sm">
@@ -459,11 +552,19 @@ export default function ProjectDetailPage() {
                           {new Date(task.dueDate).toLocaleDateString()}
                         </div>
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Priority: </span>
-                          <span className={getPriorityColor(task.priority)}>{task.priority}</span>
+                          <span className="text-muted-foreground">
+                            Priority:{" "}
+                          </span>
+                          <span className={getPriorityColor(task.priority)}>
+                            {task.priority}
+                          </span>
                         </div>
                         <Button variant="outline" size="sm" asChild>
-                          <a href={`/dashboard/projects/${params.id}/tasks/${task.id}`}>View</a>
+                          <a
+                            href={`/dashboard/projects/${params.id}/tasks/${task.id}`}
+                          >
+                            View
+                          </a>
                         </Button>
                       </div>
                     </div>
@@ -482,13 +583,19 @@ export default function ProjectDetailPage() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-medium">{task.title}</h3>
-                          <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
+                          <Badge className={getStatusColor(task.status)}>
+                            {task.status}
+                          </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">{task.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {task.description}
+                        </p>
                       </div>
                       <div className="flex flex-wrap gap-4 items-center">
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Assignee: </span>
+                          <span className="text-muted-foreground">
+                            Assignee:{" "}
+                          </span>
                           {task.assignee}
                         </div>
                         <div className="text-sm">
@@ -496,11 +603,19 @@ export default function ProjectDetailPage() {
                           {new Date(task.dueDate).toLocaleDateString()}
                         </div>
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Priority: </span>
-                          <span className={getPriorityColor(task.priority)}>{task.priority}</span>
+                          <span className="text-muted-foreground">
+                            Priority:{" "}
+                          </span>
+                          <span className={getPriorityColor(task.priority)}>
+                            {task.priority}
+                          </span>
                         </div>
                         <Button variant="outline" size="sm" asChild>
-                          <a href={`/dashboard/projects/${params.id}/tasks/${task.id}`}>View</a>
+                          <a
+                            href={`/dashboard/projects/${params.id}/tasks/${task.id}`}
+                          >
+                            View
+                          </a>
                         </Button>
                       </div>
                     </div>
@@ -516,13 +631,18 @@ export default function ProjectDetailPage() {
         <DialogContent className="max-w-3xl h-[80vh]">
           <DialogHeader>
             <DialogTitle>Project Chat: {project.name}</DialogTitle>
-            <DialogDescription>Communicate with your team about this project</DialogDescription>
+            <DialogDescription>
+              Communicate with your team about this project
+            </DialogDescription>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">
-            <ProjectChat projectId={params.id as string} projectName={project.name} />
+            <ProjectChat
+              projectId={params.id as string}
+              projectName={project.name}
+            />
           </div>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
