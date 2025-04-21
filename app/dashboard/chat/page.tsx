@@ -73,61 +73,104 @@ const directMessages = [
   },
 ]
 
-const messages = [
-  {
-    id: "1",
-    sender: "Alex Johnson",
-    content: "Hey team, I've just updated the project timeline. Please check it out when you have a moment.",
-    timestamp: "2025-04-15T09:30:00",
-    isCurrentUser: false,
-  },
-  {
-    id: "2",
-    sender: "Sarah Williams",
-    content: "I've completed the wireframes for the homepage. I'll share them in our next meeting.",
-    timestamp: "2025-04-15T10:15:00",
-    isCurrentUser: false,
-  },
-  {
-    id: "3",
-    sender: "Michael Brown",
-    content: "Looking good! I can start implementing the frontend once the designs are approved.",
-    timestamp: "2025-04-15T10:20:00",
-    isCurrentUser: false,
-  },
-  {
-    id: "4",
-    sender: "Current User",
-    content: "Great progress everyone! Let's schedule a review meeting tomorrow at 10 AM.",
-    timestamp: "2025-04-15T10:45:00",
-    isCurrentUser: true,
-  },
-  {
-    id: "5",
-    sender: "Emily Davis",
-    content: "Works for me. I'll prepare the backend API documentation by then.",
-    timestamp: "2025-04-15T11:00:00",
-    isCurrentUser: false,
-  },
-  {
-    id: "6",
-    sender: "Current User",
-    content: "Perfect! Looking forward to seeing everyone's progress.",
-    timestamp: "2025-04-15T11:05:00",
-    isCurrentUser: true,
-  },
-]
+// Messages organized by channel/conversation ID
+const initialMessages = {
+  // Project channels
+  "1": [
+    {
+      id: "1-1",
+      sender: "Alex Johnson",
+      content: "Hey team, I've just updated the project timeline for the website redesign. Please check it out when you have a moment.",
+      timestamp: "2025-04-15T09:30:00",
+      isCurrentUser: false,
+    },
+    {
+      id: "1-2", 
+      sender: "Current User",
+      content: "Thanks Alex, I'll take a look shortly.",
+      timestamp: "2025-04-15T09:45:00",
+      isCurrentUser: true,
+    },
+  ],
+  "2": [
+    {
+      id: "2-1",
+      sender: "Sarah Williams",
+      content: "I've completed the wireframes for the mobile app. I'll share them in our next meeting.",
+      timestamp: "2025-04-15T10:15:00",
+      isCurrentUser: false,
+    },
+    {
+      id: "2-2",
+      sender: "Michael Brown",
+      content: "Looking good! I can start implementing the frontend once the designs are approved.",
+      timestamp: "2025-04-15T10:20:00",
+      isCurrentUser: false,
+    },
+  ],
+  "3": [
+    {
+      id: "3-1",
+      sender: "Emily Davis",
+      content: "Marketing campaign materials are ready for review.",
+      timestamp: "2025-04-15T11:00:00",
+      isCurrentUser: false,
+    },
+  ],
+  // General channels
+  "4": [],
+  "5": [],
+  // Direct messages
+  "dm1": [
+    {
+      id: "dm1-1",
+      sender: "Alex Johnson",
+      content: "Do you have time for a quick call today?",
+      timestamp: "2025-04-15T13:30:00",
+      isCurrentUser: false,
+    },
+  ],
+  "dm2": [
+    {
+      id: "dm2-1",
+      sender: "Sarah Williams",
+      content: "I need your input on the new design system.",
+      timestamp: "2025-04-15T14:15:00",
+      isCurrentUser: false,
+    },
+    {
+      id: "dm2-2",
+      sender: "Current User",
+      content: "Happy to help. Let's discuss after the standup.",
+      timestamp: "2025-04-15T14:20:00",
+      isCurrentUser: true,
+    },
+  ],
+  "dm3": [],
+  "dm4": [
+    {
+      id: "dm4-1",
+      sender: "Emily Davis",
+      content: "Just sent you the API documentation.",
+      timestamp: "2025-04-15T15:00:00",
+      isCurrentUser: false,
+    },
+  ],
+}
 
 export default function ChatPage() {
   const { user } = useAuth()
   const [activeChannel, setActiveChannel] = useState(chatChannels[0])
   const [messageText, setMessageText] = useState("")
-  const [chatMessages, setChatMessages] = useState(messages)
+  const [messagesByChannel, setMessagesByChannel] = useState(initialMessages)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Get current channel's messages
+  const currentMessages = messagesByChannel[activeChannel.id] || []
 
   useEffect(() => {
     scrollToBottom()
-  }, [chatMessages])
+  }, [currentMessages])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -137,18 +180,23 @@ export default function ChatPage() {
     if (messageText.trim() === "") return
 
     const newMessage = {
-      id: `msg-${Date.now()}`,
+      id: `${activeChannel.id}-${Date.now()}`,
       sender: "Current User",
       content: messageText,
       timestamp: new Date().toISOString(),
       isCurrentUser: true,
     }
 
-    setChatMessages([...chatMessages, newMessage])
+    // Update messages for the active channel only
+    setMessagesByChannel(prev => ({
+      ...prev,
+      [activeChannel.id]: [...(prev[activeChannel.id] || []), newMessage]
+    }))
+    
     setMessageText("")
 
     // In a real app, this would send the message to the server
-    console.log("Message sent:", newMessage)
+    console.log("Message sent to", activeChannel.name, ":", newMessage)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -279,32 +327,38 @@ export default function ChatPage() {
           <CardContent className="flex-1 flex flex-col p-0">
             <ScrollArea className="flex-1 p-4">
               <div className="space-y-4">
-                {chatMessages.map((message) => (
-                  <div key={message.id} className={`flex ${message.isCurrentUser ? "justify-end" : "justify-start"}`}>
-                    <div className={`flex gap-3 max-w-[80%] ${message.isCurrentUser ? "flex-row-reverse" : ""}`}>
-                      {!message.isCurrentUser && (
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback>{message.sender.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                      )}
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          {!message.isCurrentUser && <span className="text-sm font-medium">{message.sender}</span>}
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </span>
-                        </div>
-                        <div
-                          className={`rounded-lg px-3 py-2 ${
-                            message.isCurrentUser ? "bg-primary text-primary-foreground" : "bg-muted"
-                          }`}
-                        >
-                          <p className="text-sm">{message.content}</p>
+                {currentMessages.length > 0 ? (
+                  currentMessages.map((message) => (
+                    <div key={message.id} className={`flex ${message.isCurrentUser ? "justify-end" : "justify-start"}`}>
+                      <div className={`flex gap-3 max-w-[80%] ${message.isCurrentUser ? "flex-row-reverse" : ""}`}>
+                        {!message.isCurrentUser && (
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback>{message.sender.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                        )}
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            {!message.isCurrentUser && <span className="text-sm font-medium">{message.sender}</span>}
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </span>
+                          </div>
+                          <div
+                            className={`rounded-lg px-3 py-2 ${
+                              message.isCurrentUser ? "bg-primary text-primary-foreground" : "bg-muted"
+                            }`}
+                          >
+                            <p className="text-sm">{message.content}</p>
+                          </div>
                         </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="flex items-center justify-center h-32 text-muted-foreground">
+                    No messages yet. Start the conversation!
                   </div>
-                ))}
+                )}
                 <div ref={messagesEndRef} />
               </div>
             </ScrollArea>
