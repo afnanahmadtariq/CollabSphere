@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,12 +66,24 @@ export default function ProjectsPage() {
   const { user } = useAuth()
   const isManager = user?.role === "manager"
   const [searchQuery, setSearchQuery] = useState("")
+  const [activeTab, setActiveTab] = useState("all")
 
-  const filteredProjects = projects.filter(
-    (project) =>
+  const filteredProjects = projects.filter((project) => {
+    // Filter by search query
+    const matchesSearch =
       project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      project.description.toLowerCase().includes(searchQuery.toLowerCase())
+
+    // Filter by tab status
+    let matchesTab = true
+    if (activeTab === "active") {
+      matchesTab = project.status === "Planning" || project.status === "In Progress"
+    } else if (activeTab === "completed") {
+      matchesTab = project.status === "Completed"
+    }
+
+    return matchesSearch && matchesTab
+  })
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -113,7 +125,7 @@ export default function ProjectsPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Tabs defaultValue="all" className="w-auto">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="active">Active</TabsTrigger>
