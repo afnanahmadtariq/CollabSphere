@@ -1,13 +1,19 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useAuth } from "@/hooks/use-auth"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -16,11 +22,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Mail, Phone, Plus, Search, UserPlus } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Mail, Phone, Plus, Search, UserPlus } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 // Mock team data
 const teamMembers = [
@@ -112,51 +124,65 @@ const teamMembers = [
     projects: ["Mobile App Development"],
     status: "Active",
   },
-]
+];
 
 export default function TeamPage() {
-  const { user } = useAuth()
-  const isManager = user?.role === "manager"
-  const [searchQuery, setSearchQuery] = useState("")
-  const [addMemberOpen, setAddMemberOpen] = useState(false)
+  const { user } = useAuth();
+  const isManager = user?.role === "manager";
+  const [searchQuery, setSearchQuery] = useState("");
+  const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [newMember, setNewMember] = useState({
     name: "",
     email: "",
     role: "",
     department: "",
     phone: "",
-  })
+  });
 
   if (!isManager) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">Access Restricted</h2>
-          <p className="text-muted-foreground">You need manager permissions to view this page.</p>
+          <p className="text-muted-foreground">
+            You need manager permissions to view this page.
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   const filteredMembers = teamMembers.filter(
     (member) =>
       member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      member.department.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      member.department.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleAddMember = () => {
     // In a real app, this would call an API to add the team member
-    if (!newMember.name || !newMember.email || !newMember.role || !newMember.department) {
+    if (
+      !newMember.name ||
+      !newMember.email ||
+      !newMember.role ||
+      !newMember.department
+    ) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    console.log("Adding team member:", newMember)
+    console.log("Adding team member:", newMember);
+    teamMembers.push({
+      ...newMember,
+      id: (teamMembers.length + 1).toString(),
+      status: "Active",
+      joinDate: new Date().toISOString(),
+      projects: [],
+    });
 
     // Reset form and close dialog
     setNewMember({
@@ -165,34 +191,36 @@ export default function TeamPage() {
       role: "",
       department: "",
       phone: "",
-    })
-    setAddMemberOpen(false)
+    });
+    setAddMemberOpen(false);
 
     toast({
       title: "Team member added",
       description: `${newMember.name} has been added to the team.`,
-    })
-  }
+    });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Active":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
       case "On Leave":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
       case "Inactive":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between gap-4 md:items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Team Management</h1>
-          <p className="text-muted-foreground">Manage your team members and their project assignments</p>
+          <p className="text-muted-foreground">
+            Manage your team members and their project assignments
+          </p>
         </div>
         <Dialog open={addMemberOpen} onOpenChange={setAddMemberOpen}>
           <DialogTrigger asChild>
@@ -204,7 +232,8 @@ export default function TeamPage() {
             <DialogHeader>
               <DialogTitle>Add New Team Member</DialogTitle>
               <DialogDescription>
-                Add a new member to your team. They will receive an invitation email.
+                Add a new member to your team. They will receive an invitation
+                email.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
@@ -214,7 +243,9 @@ export default function TeamPage() {
                   id="name"
                   placeholder="John Doe"
                   value={newMember.name}
-                  onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewMember({ ...newMember, name: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -224,7 +255,9 @@ export default function TeamPage() {
                   type="email"
                   placeholder="john.doe@example.com"
                   value={newMember.email}
-                  onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
+                  onChange={(e) =>
+                    setNewMember({ ...newMember, email: e.target.value })
+                  }
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -234,14 +267,18 @@ export default function TeamPage() {
                     id="role"
                     placeholder="Frontend Developer"
                     value={newMember.role}
-                    onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
+                    onChange={(e) =>
+                      setNewMember({ ...newMember, role: e.target.value })
+                    }
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="department">Department</Label>
                   <Select
                     value={newMember.department}
-                    onValueChange={(value) => setNewMember({ ...newMember, department: value })}
+                    onValueChange={(value) =>
+                      setNewMember({ ...newMember, department: value })
+                    }
                   >
                     <SelectTrigger id="department">
                       <SelectValue placeholder="Select department" />
@@ -251,7 +288,9 @@ export default function TeamPage() {
                       <SelectItem value="Design">Design</SelectItem>
                       <SelectItem value="Marketing">Marketing</SelectItem>
                       <SelectItem value="Management">Management</SelectItem>
-                      <SelectItem value="Quality Assurance">Quality Assurance</SelectItem>
+                      <SelectItem value="Quality Assurance">
+                        Quality Assurance
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -262,7 +301,9 @@ export default function TeamPage() {
                   id="phone"
                   placeholder="+1 (555) 123-4567"
                   value={newMember.phone}
-                  onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
+                  onChange={(e) =>
+                    setNewMember({ ...newMember, phone: e.target.value })
+                  }
                 />
               </div>
             </div>
@@ -287,7 +328,13 @@ export default function TeamPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Tabs defaultValue="all" className="w-auto">
+        <Tabs
+          defaultValue="all"
+          className="w-auto"
+          onValueChange={(value) =>
+            setSearchQuery(value === "all" ? "" : value)
+          }
+        >
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="engineering">Engineering</TabsTrigger>
@@ -300,7 +347,9 @@ export default function TeamPage() {
       <Card>
         <CardHeader>
           <CardTitle>Team Members</CardTitle>
-          <CardDescription>Manage your team members and their project assignments</CardDescription>
+          <CardDescription>
+            Manage your team members and their project assignments
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -313,7 +362,10 @@ export default function TeamPage() {
             </div>
             <div className="divide-y">
               {filteredMembers.map((member) => (
-                <div key={member.id} className="grid grid-cols-12 px-4 py-3 items-center">
+                <div
+                  key={member.id}
+                  className="grid grid-cols-12 px-4 py-3 items-center"
+                >
                   <div className="col-span-3 flex items-center gap-3">
                     <Avatar>
                       <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
@@ -328,7 +380,9 @@ export default function TeamPage() {
                   <div className="col-span-2">{member.role}</div>
                   <div className="col-span-2">{member.department}</div>
                   <div className="col-span-2">
-                    <Badge className={getStatusColor(member.status)}>{member.status}</Badge>
+                    <Badge className={getStatusColor(member.status)}>
+                      {member.status}
+                    </Badge>
                   </div>
                   <div className="col-span-3 flex flex-col gap-1">
                     <div className="flex items-center gap-2 text-sm">
@@ -350,35 +404,49 @@ export default function TeamPage() {
       <Card>
         <CardHeader>
           <CardTitle>Project Assignments</CardTitle>
-          <CardDescription>View and manage team member project assignments</CardDescription>
+          <CardDescription>
+            View and manage team member project assignments
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {["Website Redesign", "Mobile App Development", "Marketing Campaign", "Database Migration"].map(
-              (project) => (
-                <div key={project} className="space-y-3">
-                  <h3 className="font-medium text-lg">{project}</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {teamMembers
-                      .filter((member) => member.projects.includes(project))
-                      .map((member) => (
-                        <div key={member.id} className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full">
-                          <Avatar className="h-6 w-6">
-                            <AvatarFallback className="text-xs">{member.name.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <span className="text-sm">{member.name}</span>
-                        </div>
-                      ))}
-                    <Button variant="outline" size="sm" className="rounded-full h-8 gap-1">
-                      <Plus className="h-3 w-3" /> Add Member
-                    </Button>
-                  </div>
+            {[
+              "Website Redesign",
+              "Mobile App Development",
+              "Marketing Campaign",
+              "Database Migration",
+            ].map((project) => (
+              <div key={project} className="space-y-3">
+                <h3 className="font-medium text-lg">{project}</h3>
+                <div className="flex flex-wrap gap-2">
+                  {teamMembers
+                    .filter((member) => member.projects.includes(project))
+                    .map((member) => (
+                      <div
+                        key={member.id}
+                        className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full"
+                      >
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="text-xs">
+                            {member.name.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm">{member.name}</span>
+                      </div>
+                    ))}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full h-8 gap-1"
+                  >
+                    <Plus className="h-3 w-3" /> Add Member
+                  </Button>
                 </div>
-              ),
-            )}
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,7 +1,19 @@
-"use client"
+"use client";
 
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, XAxis, YAxis } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 // Mock data for the chart
 const data = [
@@ -12,7 +24,7 @@ const data = [
   { name: "Fri", completed: 6, total: 9 },
   { name: "Sat", completed: 3, total: 5 },
   { name: "Sun", completed: 2, total: 3 },
-]
+];
 
 export function DashboardChart() {
   return (
@@ -30,16 +42,27 @@ export function DashboardChart() {
       className="h-full"
     >
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+        <BarChart
+          data={data}
+          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+        >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
-          <ChartTooltip content={<ChartTooltipContent />} />
+          <ChartTooltip />
           <Legend />
-          <Bar dataKey="completed" fill="var(--color-completed)" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="total" fill="var(--color-total)" radius={[4, 4, 0, 0]} />
+          <Bar
+            dataKey="completed"
+            fill="var(--color-completed)"
+            radius={[4, 4, 0, 0]}
+          />
+          <Bar
+            dataKey="total"
+            fill="var(--color-total)"
+            radius={[4, 4, 0, 0]}
+          />
         </BarChart>
       </ResponsiveContainer>
     </ChartContainer>
-  )
+  );
 }
